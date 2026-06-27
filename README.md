@@ -31,6 +31,13 @@
 5. **选择目录**：在弹出的文件选择框中，选中本项目包含 `manifest.json` 的文件夹，点击确定即可完成安装。
 6. **开始使用**：打开任意 Shopee 商品详情页，即可在页面右侧看到“中文翻译”的迷你悬浮标，点击即可展开主面板。
 
+## 🎥 使用演示
+
+<video controls preload="metadata" style="max-width: 100%; height: auto;">
+  <source src="./help.mov" type="video/quicktime">
+  您的浏览器不支持内嵌视频播放，请直接下载或在支持的视频播放器中打开 `help.mov`。
+</video>
+
 ---
 
 ## 🛠️ 技术实现原理
