@@ -4,6 +4,9 @@
 [![Manifest Version](https://img.shields.io/badge/Manifest-V3-blue.svg)]()
 [![Platform Supported](https://img.shields.io/badge/Shopee-All%20Sites%20Supported-orange.svg)]()
 
+> 🔗 个人网站：[logicobs.xyz](https://www.logicobs.xyz/)  
+> 欢迎访问我的个人网站，查看更多作品与技术分享。
+
 专为海外淘网购与跨境选品打造的 Shopee 前端效率工具。通过纯前端拦截网络请求技术，实现评价自动翻页、多国语言实时翻译、多媒体晒单无缝集成与马币实时汇率换算，帮你一屏看尽商品真实口碑，轻松排雷！
 
 > 💡 **声明：** 本项目仅用于前端技术交流、开源学习与跨境电商市场研究，无任何后端依赖，不收集任何用户隐私。
