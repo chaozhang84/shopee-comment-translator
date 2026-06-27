@@ -15,20 +15,91 @@ let currentProductUrl = window.location.pathname;
 let capturedCommentsCount = 0;
 
 // 动态汇率逻辑
-let MYR_TO_CNY_RATE = 1.66; 
-async function fetchLiveExchangeRate() {
+const FALLBACK_EXCHANGE_RATES = {
+    MYR: 1.66,
+    SGD: 5.25,
+    IDR: 0.0005,
+    PHP: 0.13,
+    VND: 0.0003,
+    THB: 0.20,
+    BRL: 1.35,
+    USD: 7.20
+};
+
+let exchangeRateCache = {
+    currencyCode: 'MYR',
+    rate: FALLBACK_EXCHANGE_RATES.MYR,
+    fetchedAt: 0
+};
+
+function getSiteCurrencyInfo(hostname = window.location.hostname) {
+    const host = (hostname || '').toLowerCase();
+    const currencyMap = {
+        'shopee.com.my': { currencyCode: 'MYR', currencyName: '马币' },
+        'shopee.co.id': { currencyCode: 'IDR', currencyName: '印尼盾' },
+        'shopee.sg': { currencyCode: 'SGD', currencyName: '新币' },
+        'shopee.ph': { currencyCode: 'PHP', currencyName: '菲律宾比索' },
+        'shopee.vn': { currencyCode: 'VND', currencyName: '越南盾' },
+        'shopee.co.th': { currencyCode: 'THB', currencyName: '泰铢' },
+        'shopee.com.br': { currencyCode: 'BRL', currencyName: '巴西雷亚尔' },
+        'shopee.com': { currencyCode: 'USD', currencyName: '美元' }
+    };
+
+    if (currencyMap[host]) {
+        return currencyMap[host];
+    }
+
+    const fallback = { currencyCode: 'MYR', currencyName: '马币' };
+    if (host.includes('shopee.com.my')) return fallback;
+    if (host.includes('shopee.co.id')) return { currencyCode: 'IDR', currencyName: '印尼盾' };
+    if (host.includes('shopee.sg')) return { currencyCode: 'SGD', currencyName: '新币' };
+    if (host.includes('shopee.ph')) return { currencyCode: 'PHP', currencyName: '菲律宾比索' };
+    if (host.includes('shopee.vn')) return { currencyCode: 'VND', currencyName: '越南盾' };
+    if (host.includes('shopee.co.th')) return { currencyCode: 'THB', currencyName: '泰铢' };
+    if (host.includes('shopee.com.br')) return { currencyCode: 'BRL', currencyName: '巴西雷亚尔' };
+    if (host.includes('shopee.com')) return { currencyCode: 'USD', currencyName: '美元' };
+
+    return fallback;
+}
+
+async function fetchLiveExchangeRate(currencyCode = 'MYR', targetCurrency = 'CNY') {
+    const normalizedBase = (currencyCode || 'MYR').toUpperCase();
+    const normalizedTarget = (targetCurrency || 'CNY').toUpperCase();
     try {
-        const response = await fetch('https://open.er-api.com/v6/latest/MYR');
+        const response = await fetch(`https://open.er-api.com/v6/latest/${normalizedBase}`);
         const data = await response.json();
-        if (data && data.rates && data.rates.CNY) {
-            MYR_TO_CNY_RATE = parseFloat(data.rates.CNY);
-            console.log(`[中文翻译助手] 最新实时汇率：1 MYR = ${MYR_TO_CNY_RATE} CNY`);
+        if (data && data.rates && data.rates[normalizedTarget]) {
+            exchangeRateCache = {
+                currencyCode: normalizedBase,
+                rate: parseFloat(data.rates[normalizedTarget]),
+                fetchedAt: Date.now()
+            };
+            console.log(`[中文翻译助手] 最新实时汇率：1 ${normalizedBase} = ${exchangeRateCache.rate} ${normalizedTarget}`);
+            return exchangeRateCache.rate;
         }
     } catch (error) {
-        console.error('[中文翻译助手] 汇率拉取失败，启用保底汇率 1.66:', error);
+        console.error(`[中文翻译助手] 汇率拉取失败，启用保底汇率 ${FALLBACK_EXCHANGE_RATES[normalizedBase] || FALLBACK_EXCHANGE_RATES.MYR}:`, error);
     }
+
+    exchangeRateCache = {
+        currencyCode: normalizedBase,
+        rate: FALLBACK_EXCHANGE_RATES[normalizedBase] || FALLBACK_EXCHANGE_RATES.MYR,
+        fetchedAt: Date.now()
+    };
+    return exchangeRateCache.rate;
 }
-fetchLiveExchangeRate();
+
+async function ensureExchangeRate(currencyCode = 'MYR') {
+    const normalizedBase = (currencyCode || 'MYR').toUpperCase();
+    const isFresh = exchangeRateCache.currencyCode === normalizedBase && (Date.now() - exchangeRateCache.fetchedAt) < 60 * 60 * 1000;
+    if (isFresh) {
+        return exchangeRateCache.rate;
+    }
+
+    return fetchLiveExchangeRate(normalizedBase, 'CNY');
+}
+
+fetchLiveExchangeRate('MYR', 'CNY');
 
 // DOM 抓取函数组
 function getProductTitle() {
@@ -71,39 +142,40 @@ function getProductDescription() {
     return uniqueLines.join('\n');
 }
 
-function parseAndConvertCnyText(myrStr) {
-    if (!myrStr) return '未获取到原价格';
-    let cleanStr = myrStr.replace(/RM|\$|,/gi, '').trim();
-    
-    if (cleanStr.includes('-')) {
-        let parts = cleanStr.split('-');
-        let cnyParts = parts.map(p => {
-            let num = parseFloat(p.trim());
-            return isNaN(num) ? null : (num * MYR_TO_CNY_RATE).toFixed(2);
-        });
-        if (cnyParts[0] && cnyParts[1]) {
-            return `¥${cnyParts[0]} - ¥${cnyParts[1]}`;
-        }
-    } else {
-        let num = parseFloat(cleanStr);
-        if (!isNaN(num)) {
-            return `¥${(num * MYR_TO_CNY_RATE).toFixed(2)}`;
-        }
+function parseAndConvertCnyText(priceText, currencyCode = 'MYR', rate = exchangeRateCache.rate) {
+    if (!priceText) return '未获取到原价格';
+
+    const parts = priceText.split('-').map(part => part.trim()).filter(Boolean);
+    const numericParts = parts.map(part => {
+        const cleanPart = part.replace(/[^\d.,]/g, '').replace(/,/g, '').trim();
+        const num = parseFloat(cleanPart);
+        return isNaN(num) ? null : num;
+    });
+
+    if (numericParts.length > 1 && numericParts[0] !== null && numericParts[1] !== null) {
+        return `¥${(numericParts[0] * rate).toFixed(2)} - ¥${(numericParts[1] * rate).toFixed(2)}`;
     }
+
+    if (numericParts[0] !== null) {
+        return `¥${(numericParts[0] * rate).toFixed(2)}`;
+    }
+
     return '价格解析失败';
 }
 
-function refreshPriceCardData() {
+async function refreshPriceCardData() {
     const cnyPriceValEl = document.getElementById('shopee-cny-price-val');
     const rateInfoEl = document.getElementById('shopee-exchange-rate-info');
     
     if (!cnyPriceValEl || !rateInfoEl) return;
 
+    const currencyInfo = getSiteCurrencyInfo();
+    const rate = await ensureExchangeRate(currencyInfo.currencyCode);
     const rawPriceText = getProductPriceText();
-    const convertedCnyText = parseAndConvertCnyText(rawPriceText);
+    const convertedCnyText = parseAndConvertCnyText(rawPriceText, currencyInfo.currencyCode, rate);
 
     cnyPriceValEl.innerText = convertedCnyText;
-    rateInfoEl.innerText = `原价: ${rawPriceText || '--'} | 汇率: 1 MYR ≈ ${MYR_TO_CNY_RATE.toFixed(4)} CNY`;
+    rateInfoEl.innerText = `原价: ${rawPriceText || '--'} | 汇率: 1 ${currencyInfo.currencyCode} ≈ ${rate.toFixed(4)} CNY`;
 }
 
 // 提取并智能加载详情翻译
