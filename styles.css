@@ -1,0 +1,393 @@
+/* ==========================================================================
+   1. 大浮动窗口主样式 (商品详情与评价助手)
+   ========================================================================== */
+#shopee-translator-sidebar {
+    position: fixed;
+    top: 10%;
+    right: 15px; 
+    width: 350px; 
+    height: 75vh;
+    background: #ffffff;
+    border: 1px solid #198754; 
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    z-index: 999999; 
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 顶部栏 */
+.sidebar-header {
+    background: #0f5132; 
+    color: #ffffff;
+    padding: 12px 15px;
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.close-btn {
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+}
+.close-btn:hover {
+    color: #3bf19a; 
+}
+
+/* ==========================================================================
+   2. 核心：默认主面板内容区 (优先显示商品详情)
+   ========================================================================== */
+#shopee-main-detail-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.detail-scroll-body {
+    padding: 15px;
+    overflow-y: auto;
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #444;
+    text-align: left;
+    background: #fff;
+}
+
+/* 顶部：实时价格与汇率对比区 */
+.slide-price-card {
+    background: #fff5f2;
+    border: 1px solid #ff9800;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+.slide-price-card .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+.slide-price-card .cny-label {
+    font-size: 13px;
+    color: #ff5722;
+    font-weight: bold;
+}
+.slide-price-card .cny-value {
+    font-size: 18px;
+    color: #ff5722;
+    font-weight: 800;
+}
+.slide-price-card .rate-info {
+    font-size: 11px;
+    color: #777;
+    text-align: right;
+    border-top: 1px dashed #ffd0b3;
+    padding-top: 4px;
+    margin-top: 4px;
+}
+
+/* 商品标题专用样式区 */
+.translated-title-box {
+    background: #f0fdf4;
+    border: 1px dashed #198754;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    color: #111;
+}
+.translated-title-box strong {
+    display: block;
+    font-size: 11px;
+    color: #198754;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.translated-title-text {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.4;
+}
+
+/* 装饰性分割线 */
+.desc-divider {
+    font-size: 11px;
+    color: #999;
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.desc-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #eee;
+    margin-left: 8px;
+}
+
+/* 核心动作：直达评价翻译的多功能切换按钮 */
+.switch-to-reviews-btn {
+    display: block;
+    width: calc(100% - 30px);
+    margin: 10px auto 15px auto;
+    background: #198754;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(25, 135, 84, 0.3);
+    transition: background 0.2s;
+}
+.switch-to-reviews-btn:hover {
+    background: #0f5132;
+}
+
+/* ==========================================================================
+   3. 评价专属第二层抽屉面板 (默认隐藏，点击按钮后滑出)
+   ========================================================================== */
+.slide-panel {
+    width: 100%;
+    height: 100%; 
+    background: #ffffff;
+    position: absolute;
+    left: 0; 
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    
+    /* 核心动画：从右侧覆盖进来 */
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
+    transform: translateX(100%); 
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;     
+}
+
+/* 激活滑出状态 */
+.slide-panel.show {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #f1f3f5;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+}
+.panel-header h3 {
+    margin: 0;
+    font-size: 13px;
+    color: #333;
+    font-weight: bold;
+}
+.close-panel-btn {
+    font-size: 20px;
+    color: #666;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* 店铺数据与评价汇总顶层区域 */
+#ratings-summary-container {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.sidebar-overview-module {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.summary-score-box {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+}
+.big-score {
+    font-size: 22px;
+    font-weight: bold;
+    color: #0f5132; 
+}
+.score-max {
+    font-size: 12px;
+    color: #6c757d;
+}
+.mini-stars {
+    margin-left: 10px;
+    font-size: 11px;
+}
+.summary-tags-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    border-bottom: 1px dashed #dee2e6;
+    padding-bottom: 6px;
+    margin-bottom: 4px;
+}
+.summary-tag {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 2px 5px;
+    font-size: 11px;
+    color: #495057;
+}
+.summary-tag.active {
+    border-color: #198754;
+    color: #198754;
+    background: #eef7f2;
+}
+.sidebar-shop-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: #0f5132;
+}
+.shop-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 8px;
+    font-size: 11px;
+    color: #666;
+    background: #fff;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #eceff1;
+}
+.shop-info-item label {
+    font-weight: 600;
+    color: #333;
+}
+.shop-info-item span {
+    color: #198754;
+    font-weight: 600;
+}
+
+/* 评论列表区与多媒体晒图 */
+#comment-list-container {
+    padding: 12px;
+    overflow-y: auto; 
+    flex: 1;
+    scroll-behavior: smooth; 
+    background-color: #fafafa;
+}
+.placeholder-tip {
+    color: #888;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 40px;
+}
+.comment-item-box {
+    border-bottom: 1px dashed #dedede;
+    padding: 10px 0;
+    font-size: 12px;
+}
+.comment-meta {
+    color: #555;
+    margin-bottom: 4px;
+}
+.comment-star {
+    color: #ffc107;
+}
+.comment-model {
+    color: #888;
+    float: right;
+}
+.comment-text-trans {
+    color: #212529; 
+    font-weight: 500;
+    line-height: 1.5;
+    background: #eef7f2; 
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+.comment-images-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+.comment-img-item {
+    width: 50px;
+    height: 50px;
+    object-fit: cover; 
+    border-radius: 4px;
+    border: 1px solid #dcdcdc;
+}
+.comment-video-box {
+    position: relative;
+    width: 75px;
+    height: 50px;
+    background-color: #000;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.comment-video-item {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+}
+
+/* ==========================================================================
+   4. 右侧悬浮小标签 (关闭主窗时挂在网页右侧的入口)
+   ========================================================================== */
+#shopee-translator-mini-btn {
+    position: fixed;
+    top: 30%; 
+    right: 0;
+    width: 32px; 
+    padding: 12px 0; 
+    background: #0f5132; 
+    color: white;
+    border-radius: 8px 0 0 8px; 
+    box-shadow: -3px 4px 12px rgba(0,0,0,0.18);
+    z-index: 999999;
+    display: none; 
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+#shopee-translator-mini-btn div {
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1.4;
+    text-align: center;
+}
+
+/* 滚动条美化 */
+.detail-scroll-body::-webkit-scrollbar,
+#comment-list-container::-webkit-scrollbar {
+    width: 5px;
+}
+.detail-scroll-body::-webkit-scrollbar-thumb,
+#comment-list-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}

@@ -1,0 +1,73 @@
+{
+  "manifest_version": 3,
+  "name": "Shopee网购排雷助手 - 评价翻译与视频精选",
+  "version": "1.1.0",
+  "author": "Your Name",
+  "description": "专为海淘网购打造的 Shopee 评价实时翻译工具。自动过滤无意义刷单好评，一屏看尽买家真实高清晒图与原生短视频，轻松看清商品真实口碑！",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "permissions": [
+    "webRequest"
+  ],
+  "host_permissions": [
+    "https://*.shopee.com.my/*",
+    "https://*.shopee.sg/*",
+    "https://*.shopee.tw/*",
+    "https://*.shopee.co.id/*",
+    "https://*.shopee.co.th/*",
+    "https://*.shopee.ph/*",
+    "https://*.shopee.vn/*",
+    "https://*.shopee.com.br/*",
+    "https://*.shopee.cl/*",
+    "https://*.shopee.co/*",
+    "https://*.shopee.mx/*",
+    "https://translate.googleapis.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.shopee.com.my/*",
+        "https://*.shopee.sg/*",
+        "https://*.shopee.tw/*",
+        "https://*.shopee.co.id/*",
+        "https://*.shopee.co.th/*",
+        "https://*.shopee.ph/*",
+        "https://*.shopee.vn/*",
+        "https://*.shopee.com.br/*",
+        "https://*.shopee.cl/*",
+        "https://*.shopee.co/*",
+        "https://*.shopee.mx/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "inject.js"
+      ],
+      "matches": [
+        "https://*.shopee.com.my/*",
+        "https://*.shopee.sg/*",
+        "https://*.shopee.tw/*",
+        "https://*.shopee.co.id/*",
+        "https://*.shopee.co.th/*",
+        "https://*.shopee.ph/*",
+        "https://*.shopee.vn/*",
+        "https://*.shopee.com.br/*",
+        "https://*.shopee.cl/*",
+        "https://*.shopee.co/*",
+        "https://*.shopee.mx/*"
+      ]
+    }
+  ]
+}

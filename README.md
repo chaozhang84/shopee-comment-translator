@@ -1,2 +1,56 @@
-# shopee-comment-translator
-A lightweight Chrome/Edge extension (Manifest V3) for Shopee product optimization. Features live MYR/CNY rate conversion, clean &amp; de-duplicated detail translation, and a smooth infinite-scrolling review interceptor with fully integrated media rendering.
+# 🛒 Shopee网购排雷助手 - 评价翻译与视频精选
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Manifest Version](https://img.shields.io/badge/Manifest-V3-blue.svg)]()
+[![Platform Supported](https://img.shields.io/badge/Shopee-All%20Sites%20Supported-orange.svg)]()
+
+专为海外淘网购与跨境选品打造的 Shopee 前端效率工具。通过纯前端拦截网络请求技术，实现评价自动翻页、多国语言实时翻译、多媒体晒单无缝集成与马币实时汇率换算，帮你一屏看尽商品真实口碑，轻松排雷！
+
+> 💡 **声明：** 本项目仅用于前端技术交流、开源学习与跨境电商市场研究，无任何后端依赖，不收集任何用户隐私。
+
+---
+
+## ✨ 核心排雷功能
+
+*   **🌍 全站点支持**：已完美适配 Shopee 旗下所有主流国家与地区站点（包括马来西亚、新加坡、台湾、印尼、泰国、菲律宾、越南、巴西等）。
+*   **📈 实时汇率换算**：动态拉取最新国际汇率接口，将原网马币 (MYR) 等外币价格实时折算为人民币 (CNY) 直观呈现，杜绝口算误差。
+*   **📝 详情智能去重翻译**：针对 Shopee 响应式布局导致的双容器文本重复问题，采用行级严格去重算法，一键还原并翻译干净、清爽的中文商品描述。
+*   **⭐ 评价瀑布流无限翻页**：首创插件内局部集装箱触底滚动监听。当滑倒插件评价区底部时，自动、静默地模拟触发原网页的“下一页”请求，无缝追加新评价，避免频繁手动切页。
+*   **🎬 原生短视频与晒图全捕获**：打破原网评价区视频图片分散、加载慢的限制。将买家秀中的高清原图与原生短视频（.mp4）集中无缝渲染，刷单好评、真实质量一目了然。
+
+---
+
+## 🚀 安装指南 (开发者模式导入)
+
+由于本项目定位为开源技术研究，目前未上架 Chrome 应用商店。请按照以下步骤手动安装使用：
+
+1. **下载项目**：点击仓库右上角的 `Code` -> `Download ZIP` 下载源码压缩包到本地并解压。
+2. **打开扩展页面**：在 Chrome / Edge 或其他 Chromium 内核浏览器地址栏输入 `chrome://extensions/` 并回车。
+3. **开启开发者模式**：在扩展程序页面右上角，勾选打开 **“开发者模式” (Developer mode)** 开关。
+4. **加载已解压的扩展**：点击左上角的 **“加载已解压的扩展程序” (Load unpacked)** 按钮。
+5. **选择目录**：在弹出的文件选择框中，选中本项目包含 `manifest.json` 的文件夹，点击确定即可完成安装。
+6. **开始使用**：打开任意 Shopee 商品详情页，即可在页面右侧看到“中文翻译”的迷你悬浮标，点击即可展开主面板。
+
+---
+
+## 🛠️ 技术实现原理
+
+*   **安全沙箱隔离对抗（Manifest V3）**：利用现代浏览器 V3 规范，通过 `content.js` 动态将 `inject.js` 注入到真实页面（Main World）中。
+*   **网络响应流被动拦截**：通过拦截并代理原网页的 `SHOPEE_RATINGS_CAPTURED` 等原生网络事件获取底层评价流，属于**纯前端被动接收**，绝非高频爬虫，行为极度温和安全。
+*   **DOM Matrix 协同路由**：设立 `Set` 集合存储已消费的评论唯一特征标识（`comment_id`/`cmid`），从根本上避免单页应用（SPA）页面高频轮询或网络波动重试导致的数据重复与数字爆表。
+*   **局部滚动监听优化**：摒弃高开销的全局 `document` 滚动监听，将 `scroll` 事件精准绑定在插件的 `comment-list-container` 局部容器上，大幅降低单页应用的 CPU 开销，杜绝页面掉帧。
+
+---
+
+## ⚠️ 免责声明 (Disclaimer)
+
+1. 本项目所使用的翻译功能基于第三方公开免费接口（Google Translate Client GTX），翻译结果及响应速度受接口方服务状态限制，开发者不保证其永久可用性。
+2. 本项目属于**纯辅助阅读、排雷及效率提升工具**，不包含任何“一键搬家”、“店铺修改”、“恶意批量批量采集”等侵犯平台或他人利益的修改功能。
+3. 任何个人或组织因使用本项目而引发的任何形式的纠纷、账号受限、风控滑动验证码或法律责任，均由使用者自行承担，开发者不承担任何直接或间接的法律责任。
+4. 下载、安装、运行本项目源码即视为您已完全同意本声明的所有内容。
+
+---
+
+## ⚖️ 开源协议
+
+本项目基于 **[MIT License](LICENSE)** 协议开源。你可以自由复制、修改、分发甚至用于商业用途，但请在你的衍生项目中保留原作者的版权声明。出了任何问题，开发者不承担任何担保责任。
